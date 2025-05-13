@@ -10,14 +10,18 @@
 io.stdout:setvbuf("no")
 
 require "src/Dependencies"
+math.randomseed(os.time())
 
 
-local queenCard = Card(12, "hearts")
+local queenCard = Card(12, "hearts", 0, 0)
+local gameBoard = GameBoard()
 
 function love.load()
   love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
-  love.graphics.setBackgroundColor(0, 0.7, 0.2, 1)
+--  love.graphics.setBackgroundColor(0, 0.7, 0.2, 1)
   love.window.setTitle("Solitaire")
+  -- since lua is dynamic language we can access love.mouse namespace and create our own variables there
+  love.mouse.buttonsPressed = {} 
 end
 
 function love.keypressed(key)
@@ -26,20 +30,23 @@ function love.keypressed(key)
   end
 end
 
+function love.mousepressed(x, y, button)
+  love.mouse.buttonsPressed[button] = true
+end
+
+function love.mouse.wasButtonPressed(button) 
+  return love.mouse.buttonsPressed[button]
+end
+
 function love.update()
+  queenCard:update()
+  -- reset table on every frame so the flag only stays relevant for one frame
+  love.mouse.buttonsPressed = {}
 end
 
 function love.draw()
-  queenCard:render(200, 200)
---  love.graphics.draw(cardImages["diamonds"][13], 0, 0, 25)
---  for rowIndex, suits in ipairs(suits) do
---    print("rowIndex: " .. rowIndex)
---    for i=0, 12 do
---      love.graphics.draw(cardImages["hearts"][i+1], i*90, (rowIndex-1)*140, 0, 0.25, 0.25)
---    end
---  end
-
-  
+  gameBoard:draw()
+  queenCard:draw()
 end
 
 

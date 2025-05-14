@@ -1,4 +1,6 @@
 
+
+
 Deck = Class{}
 
 function Deck:init()
@@ -26,14 +28,23 @@ function Deck:shuffle()
   end
 end
 
-
+-- return a card from the deck and remove it
 function Deck:draw()
-  for i=1, 13 do 
-    print("suit: " .. self.cards[i].suit)
-    print("face: " .. self.cards[i].face)
-    love.graphics.draw(cardImages[self.cards[i].suit][self.cards[i].face], (i-1)*120, 100, 0, 0.30, 0.30)
+  if #self.cards == 0 then
+    return
   end
---  print(Dump(self.cards))
+  
+--  local index = math.random(#self.cards)
+  
+--  return table.remove(self.cards, index)
+  
+  local cardIndex = math.random(#self.cards)
+  local cardFromDeck = self.cards[cardIndex]
+  local cardToReturn = Card(cardFromDeck.face, cardFromDeck.suit)
+
+  table.remove(self.cards, cardIndex)
+
+  return cardToReturn
 end
 
 

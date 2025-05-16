@@ -126,27 +126,30 @@ end
 function GameBoard:drawBackground()
   love.graphics.clear(0, 0.3, 0, 1)
   
-  -- main stack placeholders
-  love.graphics.rectangle("line", 60, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 60, 50 + (CARD_HEIGHT*1)+20, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 60, 50 + (CARD_HEIGHT*2)+40, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 60, 50 + (CARD_HEIGHT*3)+60, CARD_WIDTH, CARD_HEIGHT, 2)
+  -- main stack placeholders (suit piles)
+  for i, pos in ipairs(SUIT_POS) do
+    local x = pos[1]
+    local y = pos[2]
+    love.graphics.rectangle("line", x, y, CARD_WIDTH, CARD_HEIGHT, 2)
+  end
   
   -- active stock card
-  love.graphics.rectangle("line", 880, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  local deckX = DECK_POS[1]
+  local deckY = DECK_POS[2]
+  love.graphics.rectangle("line", deckX, deckY, CARD_WIDTH, CARD_HEIGHT, 2)
   -- only meant for one draw pile 
   -- TODO: change this to allow three draw piles 
-  love.graphics.rectangle("line", 880, 50 + (CARD_HEIGHT+20), CARD_WIDTH, CARD_HEIGHT, 2)
-  -- love.graphics.draw(backImage, 560, 50)   
+  local drawX = DRAW_POS[1]
+  local drawY = DRAW_POS[2]
+  love.graphics.rectangle("line", drawX, drawY, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.draw(backImage, deckX, deckY)   
   
   -- tableau grid markers
-  love.graphics.rectangle("line", 200, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 200 + (CARD_WIDTH*1)+20, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 200 + (CARD_WIDTH*2)+40, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 200 + (CARD_WIDTH*3)+60, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 200 + (CARD_WIDTH*4)+80, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 200 + (CARD_WIDTH*5)+100, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 200 + (CARD_WIDTH*6)+120, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  for i, pos in ipairs(TABLEAUS_POS) do
+    local x = pos[1]
+    local y = pos[2]
+    love.graphics.rectangle("line", x, y, CARD_WIDTH, CARD_HEIGHT, 2)
+  end
   
 end
 

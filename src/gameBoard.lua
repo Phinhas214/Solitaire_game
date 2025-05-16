@@ -8,11 +8,12 @@ GameBoard = Class{}
 function GameBoard:init()
   self.deck = Deck()
   self.tableaus = {}
-  self.tablePool = {}  -- TODO: unused variable
+  self.drawPile = {}  
   self.cardPickedUp = false
   self.pickedUpCards = {}
   
   self:generateTableaus()
+  self:generateDrawPile()
   
 end
 
@@ -52,6 +53,19 @@ function GameBoard:generateTableaus()
   end
 end
 
+function GameBoard:generateDrawPile()
+  local counter = 0
+  while #self.deck.cards > 1 do
+    local newCard = self.deck:draw()
+    counter = counter + 1
+    newCard.x = DECK_POS[1]
+    newCard.y = DECK_POS[2]
+    newCard.hidden = true
+    table.insert(self.drawPile, newCard)
+  end
+  
+end
+
 function GameBoard:update(dt)
   
   -- update all cards in staging table first
@@ -72,7 +86,7 @@ function GameBoard:update(dt)
         currCard:update(dt, self)
       end
     end
-    --self.pickedUpCards[i]:update(dt, self)
+    
   end
   
   -- iterate thru all visible cards, allowing mouse input
@@ -92,10 +106,7 @@ function GameBoard:update(dt)
       self.tableaus[i][j]:update(dt, self, self.tableaus[i])
     end
   end
-  
---  print(#self.pickedUpCards)
-  
-  
+
 end
 
 function GameBoard:draw()
@@ -104,7 +115,10 @@ function GameBoard:draw()
   -- render tableaus
   self:renderTableaus()
   
+  self:renderDrawPile()
+  
   self:renderPickedUpCards()
+  
 end
 
 function GameBoard:renderPickedUpCards()
@@ -122,6 +136,11 @@ function GameBoard:renderTableaus()
   end
 end
 
+function GameBoard:renderDrawPile()
+  for i=1, #self.drawPile do
+    self.drawPile[i]:draw(x, y)
+  end
+end
 
 function GameBoard:drawBackground()
   love.graphics.clear(0, 0.3, 0, 1)
@@ -142,7 +161,6 @@ function GameBoard:drawBackground()
   local drawX = DRAW_POS[1]
   local drawY = DRAW_POS[2]
   love.graphics.rectangle("line", drawX, drawY, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.draw(backImage, deckX, deckY)   
   
   -- tableau grid markers
   for i, pos in ipairs(TABLEAUS_POS) do

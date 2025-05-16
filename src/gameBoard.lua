@@ -8,7 +8,7 @@ GameBoard = Class{}
 function GameBoard:init()
   self.deck = Deck()
   self.tableaus = {}
-  self.tablePool = {}
+  self.tablePool = {}  -- TODO: unused variable
   self.cardPickedUp = false
   self.pickedUpCards = {}
   
@@ -21,8 +21,8 @@ function GameBoard:generateTableaus()
   for i=1, NUM_TABLEAUS do
     table.insert(self.tableaus, {})
     
-    local yPos = 200
-    local xPos = 20 + CARD_WIDTH * (i-1) + 20 * (i-1)
+    local yPos = 50
+    local xPos = 200 + CARD_WIDTH * (i-1) + 20 * (i-1)
     local padding = 0
     
     for j=1, i do
@@ -127,26 +127,26 @@ function GameBoard:drawBackground()
   love.graphics.clear(0, 0.3, 0, 1)
   
   -- main stack placeholders
-  love.graphics.rectangle("line", 20, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*1)+20, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*2)+40, 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*3)+60, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 60, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 60, 50 + (CARD_HEIGHT*1)+20, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 60, 50 + (CARD_HEIGHT*2)+40, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 60, 50 + (CARD_HEIGHT*3)+60, CARD_WIDTH, CARD_HEIGHT, 2)
   
   -- active stock card
-  love.graphics.rectangle("line", 470, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 880, 50, CARD_WIDTH, CARD_HEIGHT, 2)
   -- only meant for one draw pile 
   -- TODO: change this to allow three draw piles 
-  love.graphics.rectangle("line", 470 + (CARD_WIDTH+20), 50, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.draw(backImage, 560, 50)   
+  love.graphics.rectangle("line", 880, 50 + (CARD_HEIGHT+20), CARD_WIDTH, CARD_HEIGHT, 2)
+  -- love.graphics.draw(backImage, 560, 50)   
   
   -- tableau grid markers
-  love.graphics.rectangle("line", 20, 200, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*1)+20, 200, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*2)+40, 200, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*3)+60, 200, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*4)+80, 200, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*5)+100, 200, CARD_WIDTH, CARD_HEIGHT, 2)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*6)+120, 200, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 200, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 200 + (CARD_WIDTH*1)+20, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 200 + (CARD_WIDTH*2)+40, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 200 + (CARD_WIDTH*3)+60, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 200 + (CARD_WIDTH*4)+80, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 200 + (CARD_WIDTH*5)+100, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 200 + (CARD_WIDTH*6)+120, 50, CARD_WIDTH, CARD_HEIGHT, 2)
   
 end
 

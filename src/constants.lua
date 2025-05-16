@@ -32,3 +32,4 @@ SUIT_POS = {
 
 DECK_POS = {880, 50}
 DRAW_POS = {880, 170}
+

@@ -10,10 +10,36 @@ function GameBoard:init()
   self.tableaus = {}
   self.drawPile = {}  
   self.cardPickedUp = false
-  self.pickedUpCards = {}
+  self.pickedUpCards = {} -- staging area for tableau picked up cards
+  self.wastePile = {}  -- staging area for deck cards when clicked
   
   self:generateTableaus()
   self:generateDrawPile()
+  
+end
+
+function GameBoard:recycleWastePile()
+  while #self.wastePile > 0 do
+    local card = table.remove(self.wastePile)
+    card.hidden = true
+    card.x = DECK_POS[1]
+    card.y = DECK_POS[2]
+    table.insert(self.drawPile, 1, card) -- insert back at bottom
+  end
+end
+
+function GameBoard:drawCardsFromPile(n) 
+  
+  self:recycleWastePile()
+  
+  for i=1, math.min(n, #self.drawPile) do
+    local card = table.remove(self.drawPile) -- remove a card form top
+    card.hidden = false
+    card.x = DRAW_POS[1]
+    card.y = DRAW_POS[2] + (PADDING * (i-1))
+    table.insert(self.wastePile, card)
+  end
+  
   
 end
 
@@ -68,6 +94,18 @@ end
 
 function GameBoard:update(dt)
   
+  local mx, my = love.mouse.getPosition()
+  if love.mouse.wasButtonPressed(1) then
+    if mx >= DECK_POS[1] and mx <= DECK_POS[1] + CARD_WIDTH and 
+      my >= DECK_POS[2] and my <= DECK_POS[2] + CARD_HEIGHT then
+        
+        self:drawCardsFromPile(3)
+        
+    end
+  end
+  
+  
+  
   -- update all cards in staging table first
   for i=1, #self.pickedUpCards do
     if #self.pickedUpCards > 0 then
@@ -119,11 +157,21 @@ function GameBoard:draw()
   
   self:renderPickedUpCards()
   
+  self:renderWastePile()
+  
 end
 
 function GameBoard:renderPickedUpCards()
+  
   for i=1, #self.pickedUpCards do
     self.pickedUpCards[i]:draw()
+  end
+end
+
+function GameBoard:renderWastePile()
+  for i=1, #self.wastePile do
+    local card = self.wastePile[i]
+    card:draw()
   end
 end
 

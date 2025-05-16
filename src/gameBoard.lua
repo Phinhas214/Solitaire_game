@@ -56,7 +56,23 @@ function GameBoard:update(dt)
   
   -- update all cards in staging table first
   for i=1, #self.pickedUpCards do
-    self.pickedUpCards[i]:update(dt, self)
+    if #self.pickedUpCards > 0 then
+      local topCard = self.pickedUpCards[1]
+      local mouseX, mouseY = love.mouse.getPosition()
+      topCard.x = mouseX - CARD_WIDTH / 2
+      topCard.y = mouseY - CARD_HEIGHT / 2
+      topCard:update(dt, self)
+      
+      -- offset the rest of the cards downward
+      for i=2, #self.pickedUpCards do
+        local prevCard = self.pickedUpCards[i-1]
+        local currCard = self.pickedUpCards[i]
+        currCard.x = prevCard.x
+        currCard.y = prevCard.y + PADDING
+        currCard:update(dt, self)
+      end
+    end
+    --self.pickedUpCards[i]:update(dt, self)
   end
   
   -- iterate thru all visible cards, allowing mouse input

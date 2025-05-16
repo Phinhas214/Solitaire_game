@@ -32,16 +32,40 @@ function Card:pickUp(tableau, gameBoard)
     return
   end
   
-  -- fall back positions
-  self.originalX = self.x
-  self.originalY = self.y
-  self.originalTableau = tableau
-  
-  table.insert(gameBoard.pickedUpCards, table.remove(tableau, #tableau))
-  
-  if self.child then
-    self.child:pickUp()
+  -- find index of this card in tableau
+  local index = nil
+  for i=1, #tableau do
+    if self == tableau[i] then
+      index = i
+      break
+    end
   end
+  
+  if index == nil then return end
+  
+  -- sever parent-child relationships lol
+  if tableau[index].parent ~= nil then
+    tableau[index].parent.child = nil
+    tableau[index].parent = nil
+  end
+  
+  
+  
+  -- store original info for each card in the stack
+  for i=index, #tableau do
+    local card = tableau[i]
+    card.pickedUp = true
+    card.originalX = card.x
+    card.originalY = card.y
+    card.originalTableau = tableau
+    table.insert(gameBoard.pickedUpCards, card)
+  end
+  
+  -- Remove them from the tableau
+  for i = #tableau, index, -1 do
+    table.remove(tableau, i)
+  end
+  
 end
 
 -- find the card object the mouse is hovering over and rertun the card AND index
@@ -61,50 +85,77 @@ function Card:mouseOverCard(x, y, gameBoard)
   return nil, nil
 end
 
+function Card:placeCardStack(destinationCard, tableauToSnap, gameBoard)
+  local stack = gameBoard.pickedUpCards
+  local x, y = destinationCard and destinationCard.x or self.x, destinationCard and destinationCard.y + PADDING or self.y
+  
+  for i, card in ipairs(stack) do
+    card.x = x
+    card.y = y
+    table.insert(tableauToSnap, card)
+    
+    -- update parent-child links
+    card.parent = (i == 1 and destinationCard) or stack[i-1]
+    if i > 1 then
+      stack[i-1].child = card
+    end
+    
+    y = y + PADDING
+  end
+  
+  if destinationCard then
+    destinationCard.child = stack[1]
+  end
+  
+  -- clear staging 
+  gameBoard.pickedUpCards = {}
+  
+  
+end
+
 
 function Card:placeDown(gameBoard)
   -- card by itself
-  if self.child == nil and self.parent == nil then
-    -- check to see if placing in tableau OR winning pile
-    local x, y = love.mouse.getPosition()
-    local cardToSnap, index = self:mouseOverCard(x, y, gameBoard) --returns card and index of tableau
+
+  -- check to see if placing in tableau OR winning pile
+  local x, y = love.mouse.getPosition()
+  local cardToSnap, index = self:mouseOverCard(x, y, gameBoard) --returns card and index of where mouse is pointing
+  
+  if cardToSnap and index then
+    local tableauToSnap = gameBoard.tableaus[index]
+     self:placeCardStack(cardToSnap, tableauToSnap, gameBoard)
+     
+     self.originalX = self.x
+     self.originalY = self.y
+     self.originalTableau = tableauToSnap
+     
+  else 
     
-    if cardToSnap and index then
-      local tableauToSnap = gameBoard.tableaus[index]
-       self.x = cardToSnap.x
-       self.y = cardToSnap.y + PADDING
-       
-       table.insert(tableauToSnap, table.remove(gameBoard.pickedUpCards))
-       
-       self.originalX = self.x
-       self.originalY = self.y
-       self.originalTableau = tableauToSnap
-       
-       cardToSnap.child = self
-       self.parent = cardToSnap
-    else 
-      table.insert(self.originalTableau, self) 
-      self.x = self.originalX
-      self.y = self.originalY
+    local stack = gameBoard.pickedUpCards
+    local x = self.originalX
+    local y = self.originalY
+    
+    for i, card in ipairs(stack) do
+      card.x = x
+      card.y = y
+      card.pickedUp = false
+      card.originalTableau = self.originalTableau
+      table.insert(self.originalTableau, card)
       
-      -- clean up holding table 
-      for i, card in ipairs(gameBoard.pickedUpCards) do
-        if card == self then
-          table.remove(gameBoard.pickedUpCards, i)
-          break
-        end
+      -- reset parent-child links
+      card.parent = (i==1) and nil or stack[i-1]
+      if i > 1 then
+        stack[i-1].child = card
       end
       
+      y = y + PADDING
       
     end
     
-    
-    
-  -- otherwise, only worry about placing a top-level card
-  -- place ONLY in tableaus, not winning piles
-  elseif self.child ~= nil then
+    gameBoard.pickedUpCards = {}
     
   end
+
 end
 
 function Card:update(dt, gameBoard, tableau)
@@ -135,14 +186,13 @@ function Card:update(dt, gameBoard, tableau)
     if x >= self.x and x <= self.x + CARD_WIDTH and y >= self.y and y <= self.y + yBounds then
       -- ensure we're not already picking up a card
       if not gameBoard.cardPickedUp then
-        if self.parent == nil then
-          self:pickUp(tableau, gameBoard)
-          local currParent = self.parent or 0
-          local currChild = self.child or 0
-          print("parent of: " .. self.suit .. " " .. self.face .. " = " .. currParent)
---          print("child of: " .. self.suit .. " " .. self.face .. " = " .. currChild)
-          gameBoard.cardPickedUp = true
+        self:pickUp(tableau, gameBoard)
+        -- detach from previous card parent
+        if self.parent then
+          self.parent.child = nil
+          self.parent = nil
         end
+        gameBoard.cardPickedUp = true
       end
     end
     

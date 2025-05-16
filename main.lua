@@ -16,6 +16,7 @@ function love.load()
     love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
 
     love.mouse.buttonsPressed = {}
+    love.mouse.buttonReleased = {}
 end
 
 function love.keypressed(key)
@@ -28,14 +29,23 @@ function love.mousepressed(x, y, button)
     love.mouse.buttonsPressed[button] = true
 end
 
+function love.mousereleased(x, y, button)
+    love.mouse.buttonsReleased[button] = true
+end
+
 function love.mouse.wasButtonPressed(button)
     return love.mouse.buttonsPressed[button]
+end
+
+function love.mouse.wasButtonReleased(button)
+    return love.mouse.buttonsReleased[button]
 end
 
 function love.update(dt)
     gameBoard:update(dt)
     
     love.mouse.buttonsPressed = {}
+    love.mouse.buttonsReleased = {}
 end
 
 function love.draw()

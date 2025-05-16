@@ -21,8 +21,8 @@ function GameBoard:generateTableaus()
   for i=1, NUM_TABLEAUS do
     table.insert(self.tableaus, {})
     
-    local yPos = 250
-    local xPos = 21 + CARD_WIDTH * (i-1) + 20 * (i-1)
+    local yPos = 200
+    local xPos = 20 + CARD_WIDTH * (i-1) + 20 * (i-1)
     local padding = 0
     
     for j=1, i do
@@ -31,12 +31,24 @@ function GameBoard:generateTableaus()
       newCard.y = yPos
       table.insert(self.tableaus[i], newCard)
       
-      -- ensure topmost card is set to visible
-      self.tableaus[i][j].hidden = j ~= i
       
-      local padding = self.tableaus[i][j].hidden and 20 or 50
-      yPos = yPos + padding
+      self.tableaus[i][j].hidden = j ~= i -- ensure topmost card is set to visible
+      -- bigger padding if card is revealed
+      -- local padding = self.tableaus[i][j].hidden and 20 or 50
+      local padding = 20
+      yPos = yPos + PADDING
     end
+    
+    local pile = self.tableaus[i]
+    for j=1, #pile-1 do
+      local currCard = pile[j]
+      local nextCard = pile[j+1]
+      if not currCard.hidden and not nextCard.hidden then
+        currCard.child = nextCard
+        nextCard.parent = currCard
+      end
+    end
+    
   end
 end
 
@@ -99,26 +111,26 @@ function GameBoard:drawBackground()
   love.graphics.clear(0, 0.3, 0, 1)
   
   -- main stack placeholders
-  love.graphics.rectangle("line", 20, 50, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*1)+20, 50, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*2)+40, 50, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*3)+60, 50, CARD_WIDTH, CARD_HEIGHT, 10)
+  love.graphics.rectangle("line", 20, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*1)+20, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*2)+40, 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*3)+60, 50, CARD_WIDTH, CARD_HEIGHT, 2)
   
   -- active stock card
-  love.graphics.rectangle("line", 660, 50, CARD_WIDTH, CARD_HEIGHT, 10)
+  love.graphics.rectangle("line", 470, 50, CARD_WIDTH, CARD_HEIGHT, 2)
   -- only meant for one draw pile 
   -- TODO: change this to allow three draw piles 
-  love.graphics.rectangle("line", 660 + (CARD_WIDTH+20), 50, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.draw(backImage, 789, 50)   
+  love.graphics.rectangle("line", 470 + (CARD_WIDTH+20), 50, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.draw(backImage, 560, 50)   
   
   -- tableau grid markers
-  love.graphics.rectangle("line", 20, 250, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*1)+20, 250, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*2)+40, 250, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*3)+60, 250, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*4)+80, 250, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*5)+100, 250, CARD_WIDTH, CARD_HEIGHT, 10)
-  love.graphics.rectangle("line", 20 + (CARD_WIDTH*6)+120, 250, CARD_WIDTH, CARD_HEIGHT, 10)
+  love.graphics.rectangle("line", 20, 200, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*1)+20, 200, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*2)+40, 200, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*3)+60, 200, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*4)+80, 200, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*5)+100, 200, CARD_WIDTH, CARD_HEIGHT, 2)
+  love.graphics.rectangle("line", 20 + (CARD_WIDTH*6)+120, 200, CARD_WIDTH, CARD_HEIGHT, 2)
   
 end
 

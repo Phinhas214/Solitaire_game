@@ -9,7 +9,7 @@ require 'src/Dependencies'
 
 math.randomseed(os.time())
 
-local gameBoard = GameBoard()
+gameBoard = GameBoard()
 
 function love.load()
     love.window.setTitle('Solitaire')
@@ -17,11 +17,15 @@ function love.load()
 
     love.mouse.buttonsPressed = {}
     love.mouse.buttonReleased = {}
+    
+    gameBoard = GameBoard()
 end
 
 function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
+    elseif key == "r" then
+      love.load()
     end
 end
 
@@ -42,10 +46,10 @@ function love.mouse.wasButtonReleased(button)
 end
 
 function love.update(dt)
-    gameBoard:update(dt)
-    
-    love.mouse.buttonsPressed = {}
-    love.mouse.buttonsReleased = {}
+  gameBoard:update(dt)
+  
+  love.mouse.buttonsPressed = {}
+  love.mouse.buttonsReleased = {}
 end
 
 function love.draw()

@@ -28,6 +28,7 @@ end
 function Card:pickUp(tableau, gameBoard)
   self.pickedUp = true
   
+  -- TODO: add logic to account for gameBoard.wastePile
   if tableau == nil then
     return
   end
@@ -115,9 +116,8 @@ end
 
 
 function Card:placeDown(gameBoard)
-  -- card by itself
-
-  -- check to see if placing in tableau OR winning pile
+  
+  
   local x, y = love.mouse.getPosition()
   local cardToSnap, index = self:mouseOverCard(x, y, gameBoard) --returns card and index of where mouse is pointing
   

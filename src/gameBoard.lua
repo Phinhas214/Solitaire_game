@@ -25,7 +25,7 @@ function GameBoard:recycleWastePile()
     card.x = DECK_POS[1]
     card.y = DECK_POS[2]
     table.insert(self.drawPile, 1, card) -- insert back at bottom
-  end
+  end 
 end
 
 function GameBoard:drawCardsFromPile(n) 
@@ -93,7 +93,7 @@ function GameBoard:generateDrawPile()
 end
 
 function GameBoard:update(dt)
-  
+  -- update logic for deck pile
   local mx, my = love.mouse.getPosition()
   if love.mouse.wasButtonPressed(1) then
     if mx >= DECK_POS[1] and mx <= DECK_POS[1] + CARD_WIDTH and 
@@ -104,7 +104,17 @@ function GameBoard:update(dt)
     end
   end
   
-  
+  if love.mouse.wasButtonPressed(1) and #self.wastePile > 0 and not self.cardPickedUp then
+    -- LMAO
+    local topWastedCard = self.wastePile[#self.wastePile]
+    
+    if mx >= topWastedCard.x and mx <= topWastedCard.x + CARD_WIDTH and 
+      my >= topWastedCard.y and my <= topWastedCard.y + CARD_HEIGHT then
+        -- remove card from waste and pick it up
+        topWastedCard:pickUp(self.wastePile, self)
+        
+    end
+  end
   
   -- update all cards in staging table first
   for i=1, #self.pickedUpCards do
@@ -150,14 +160,14 @@ end
 function GameBoard:draw()
   self:drawBackground()
   
-  -- render tableaus
+  -- render card piles
   self:renderTableaus()
   
   self:renderDrawPile()
   
-  self:renderPickedUpCards()
-  
   self:renderWastePile()
+  
+  self:renderPickedUpCards()
   
 end
 

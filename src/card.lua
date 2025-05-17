@@ -117,20 +117,31 @@ end
 
 function Card:placeDown(gameBoard)
   
-  
   local x, y = love.mouse.getPosition()
   local cardToSnap, index = self:mouseOverCard(x, y, gameBoard) --returns card and index of where mouse is pointing
   
-  if cardToSnap and index then
-    local tableauToSnap = gameBoard.tableaus[index]
-     self:placeCardStack(cardToSnap, tableauToSnap, gameBoard)
-     
-     self.originalX = self.x
-     self.originalY = self.y
-     self.originalTableau = tableauToSnap
-     
-  else 
+  -- placing down onto suits logic
+  for suit, pile in pairs(gameBoard.suits) do
+
+    local pos = SUIT_POS[suit]
     
+    if x >= pos[1] and x <= pos[1] + CARD_WIDTH and 
+     y >= pos[2] and y <= pos[2] + CARD_HEIGHT then
+       
+      if gameBoard:canPlaceInSuitPile(self, suit) then
+         gameBoard:placeCardInSuitPile(self, suit)
+         gameBoard.pickedUpCards = {}
+         self.originalTableau[#self.originalTableau].hidden = false
+         return
+      end
+       
+    end
+      
+  end
+  
+  local valid = self:isValidPlacement(cardToSnap, self)
+  
+  if not valid or cardToSnap == nil or index == nil then
     local stack = gameBoard.pickedUpCards
     local x = self.originalX
     local y = self.originalY
@@ -154,8 +165,60 @@ function Card:placeDown(gameBoard)
     
     gameBoard.pickedUpCards = {}
     
+  else 
+    
+    -- checks if card value is one less than cardToSnap and of alternating color
+    local tableauToSnap = gameBoard.tableaus[index]
+    self:placeCardStack(cardToSnap, tableauToSnap, gameBoard)
+    
+    -- flip last card of originalTableau
+    if #self.originalTableau > 0 then
+      self.originalTableau[#self.originalTableau].hidden = false
+    end
+    
+     
+    self.originalX = self.x
+    self.originalY = self.y
+    self.originalTableau = tableauToSnap
+    
   end
+  
+end
 
+-- returns number that signifies if card is red or black
+function Card:cardColor(card)
+
+  if card.suit == "clubs" or card.suit == "spades" then
+    return IS_BLACK
+  elseif card.suit == "diamonds" or card.suit == "hearts" then
+    return IS_RED
+  end
+  
+end
+
+-- returns true if placement is valid based on game rules, and false otherwise
+function Card:isValidPlacement(parentCard, childCard)
+  
+  if parentCard == nil or childCard == nil then
+    return false
+  end
+  
+  local isVal = (parentCard.face-1 == childCard.face) and true or false
+  
+  if isVal ~= true then
+    return false
+  end
+  
+  -- if parent is a red card
+  if self:cardColor(parentCard) == IS_RED then
+    -- valid only if is of alternating colors and is one less than parent card
+    isVal = (self:cardColor(childCard) == IS_BLACK) and true or false
+  -- if parent is a black card
+  elseif self:cardColor(parentCard) == IS_BLACK then
+    isVal = (self:cardColor(childCard) == IS_RED) and true or false
+  end
+  
+  return isVal
 end
 
 function Card:update(dt, gameBoard, tableau)
@@ -197,7 +260,6 @@ function Card:update(dt, gameBoard, tableau)
     end
     
   end
-  
   
   -- right click to flip
   if love.mouse.wasButtonPressed(2) and self.hidden then

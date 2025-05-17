@@ -13,6 +13,13 @@ function GameBoard:init()
   self.pickedUpCards = {} -- staging area for tableau picked up cards
   self.wastePile = {}  -- staging area for deck cards when clicked
   
+  self.suits = {
+    ["hearts"] = {},
+    ["diamonds"] = {},
+    ["clubs"] = {},
+    ["spades"] = {}
+  }
+  
   self:generateTableaus()
   self:generateDrawPile()
   
@@ -39,7 +46,6 @@ function GameBoard:drawCardsFromPile(n)
     card.y = DRAW_POS[2] + (PADDING * (i-1))
     table.insert(self.wastePile, card)
   end
-  
   
 end
 
@@ -90,6 +96,33 @@ function GameBoard:generateDrawPile()
     table.insert(self.drawPile, newCard)
   end
   
+end
+
+function GameBoard:canPlaceInSuitPile(card, suit)
+  local pile = self.suits[suit]
+  if #pile == 0 then
+    return card.face == 1
+  else 
+    local topCard = pile[#pile]
+    return card.suit == topCard.suit and card.face == topCard.face + 1
+  end
+end
+
+function GameBoard:placeCardInSuitPile(card, suit)
+  local suitPos = self:suitToIndex(suit)
+  card.x = SUIT_POS[suit][1]
+  card.y = SUIT_POS[suit][2]
+  card.parent = nil
+  card.child = nil
+  table.insert(self.suits[suit], card)
+end
+
+function GameBoard:suitToIndex(suit)
+  if suit == "hearts" then return 1
+  elseif suit == "diamonds" then return 2
+  elseif suit == "clubs" then return 3
+  elseif suit == "spades" then return 4
+  end 
 end
 
 function GameBoard:update(dt)
@@ -167,6 +200,12 @@ function GameBoard:draw()
   
   self:renderWastePile()
   
+  for suit, pile in pairs(self.suits) do
+    if #pile > 0 then
+      pile[#pile]:draw()
+    end
+  end
+  
   self:renderPickedUpCards()
   
 end
@@ -203,11 +242,21 @@ end
 function GameBoard:drawBackground()
   love.graphics.clear(0, 0.3, 0, 1)
   
+  suits = {"hearts", "diamonds", "clubs", "spades"}
+  -- suits = {"spades", "clubs", "diamonds", "hearts"}
+  
   -- main stack placeholders (suit piles)
-  for i, pos in ipairs(SUIT_POS) do
-    local x = pos[1]
-    local y = pos[2]
+  for i, pos in pairs(SUIT_POS) do
+    local x = pos[1] 
+    local y = pos[2] 
     love.graphics.rectangle("line", x, y, CARD_WIDTH, CARD_HEIGHT, 2)
+    
+    local suitName = i
+    local fileName = string.format("graphics/%s_symbol.png", suitName)
+    local suitSymbol = love.graphics.newImage(fileName)
+    love.graphics.draw(suitSymbol, x + CARD_WIDTH/3, y + CARD_HEIGHT/3, 0, 0.50, 0.50)
+    
+    
   end
   
   -- active stock card

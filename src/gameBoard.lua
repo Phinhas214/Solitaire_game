@@ -187,6 +187,13 @@ function GameBoard:update(dt)
       self.tableaus[i][j]:update(dt, self, self.tableaus[i])
     end
   end
+  
+  -- update foundation cards in suit pile
+  for suit, pile in pairs(self.suits) do
+    if #pile > 0 then
+      pile[#pile]:update(dt, self, pile)
+    end
+  end
 
 end
 

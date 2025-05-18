@@ -50,8 +50,6 @@ function Card:pickUp(tableau, gameBoard)
     tableau[index].parent = nil
   end
   
-  
-  
   -- store original info for each card in the stack
   for i=index, #tableau do
     local card = tableau[i]
@@ -131,7 +129,10 @@ function Card:placeDown(gameBoard)
       if gameBoard:canPlaceInSuitPile(self, suit) then
          gameBoard:placeCardInSuitPile(self, suit)
          gameBoard.pickedUpCards = {}
-         self.originalTableau[#self.originalTableau].hidden = false
+        if #self.originalTableau > 0 then
+          self.originalTableau[#self.originalTableau].hidden = false
+        end
+         
          return
       end
        
@@ -139,9 +140,48 @@ function Card:placeDown(gameBoard)
       
   end
   
+  for i, tableau in ipairs(gameBoard.tableaus) do
+    local pos = TABLEAUS_POS[i]
+    
+    if #tableau == 0 and self.face == 13 and
+       x >= pos[1] and x <= pos[1] + CARD_WIDTH and 
+       y >= pos[2] and y <= pos[2] + CARD_HEIGHT
+    then
+      
+      -- manually place on empty tableau
+      local stack = gameBoard.pickedUpCards
+      local cx = pos[1]
+      local cy = pos[2]
+      
+      for j, card in ipairs(stack) do
+        card.x = cx
+        card.y = cy
+        card.pickedUp = false
+        table.insert(tableau, card)
+        
+        card.parent = (j == 1) and nil or stack[j - 1]
+        if j > 1 then
+          stack[j-1].child = card
+        end
+        
+        cy = cy + PADDING
+      end
+      
+      gameBoard.pickedUpCards = {}
+      
+      if self.originalTableau and #self.originalTableau > 0 then
+        self.originalTableau[#self.originalTableau].hidden = false
+      end
+      
+      return
+    end
+  end
+  
+  
   local valid = self:isValidPlacement(cardToSnap, self)
   
-  if not valid or cardToSnap == nil or index == nil then
+  if not valid or cardToSnap == nil or index == nil and self.face ~= 13 then
+    
     local stack = gameBoard.pickedUpCards
     local x = self.originalX
     local y = self.originalY
@@ -166,6 +206,20 @@ function Card:placeDown(gameBoard)
     gameBoard.pickedUpCards = {}
     
   else 
+    if self.face == 13 then -- if the card is a king snap to empty grid
+      for i, pos in ipairs(TABLEAUS_POS) do
+        if x >= pos[1] and x <= pos[1] + CARD_WIDTH and 
+           y >= pos[2] and y <= pos[2] + CARD_HEIGHT then
+             
+            self.x = TABLEAUS_POS[i] -- where-ever the mouse is hovering
+            self.y = TABLEAUS_POS[i] 
+             
+        end
+        
+        
+      end
+      
+    end
     
     -- checks if card value is one less than cardToSnap and of alternating color
     local tableauToSnap = gameBoard.tableaus[index]

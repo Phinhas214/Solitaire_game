@@ -261,7 +261,7 @@ function GameBoard:drawBackground()
     local suitName = i
     local fileName = string.format("graphics/%s_symbol.png", suitName)
     local suitSymbol = love.graphics.newImage(fileName)
-    love.graphics.draw(suitSymbol, x + CARD_WIDTH/3, y + CARD_HEIGHT/3, 0, 0.50, 0.50)
+    -- love.graphics.draw(suitSymbol, x + CARD_WIDTH/3, y + CARD_HEIGHT/3, 0, 0.50, 0.50)
     
     
   end

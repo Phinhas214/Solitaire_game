@@ -58,7 +58,7 @@ function love.update(dt)
     local winCounter = 0
     for _, pile in pairs(gameBoard.suits) do
       winCounter = winCounter + #pile
-      if winCounter == 1 then
+      if winCounter == 52 then
         gameWon = true
       end
       

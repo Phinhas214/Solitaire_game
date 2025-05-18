@@ -11,12 +11,6 @@ require "src/card"
 require "src/deck"
 
 
-gTextures = {
-  
-  ['cards'] = love
-  
-}
-
 
 --TODO: load card images
 cardImages = {

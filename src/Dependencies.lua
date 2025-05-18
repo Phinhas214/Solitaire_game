@@ -37,3 +37,4 @@ for suit, _ in pairs(cardImages) do
 end
   
 backImage = love.graphics.newImage("graphics/back07.png")
+you_win = love.graphics.newImage("graphics/you_win.png")

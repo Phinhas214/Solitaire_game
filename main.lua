@@ -1,8 +1,7 @@
 --[[
     Solitaire
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Phineas Asmelash
 ]]
 
 require 'src/Dependencies'
@@ -10,6 +9,7 @@ require 'src/Dependencies'
 math.randomseed(os.time())
 
 gameBoard = GameBoard()
+local gameWon = false
 
 function love.load()
     love.window.setTitle('Solitaire')
@@ -25,6 +25,7 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     elseif key == "r" then
+      gameWon = false
       love.load()
     end
 end
@@ -46,14 +47,32 @@ function love.mouse.wasButtonReleased(button)
 end
 
 function love.update(dt)
-  gameBoard:update(dt)
   
-  love.mouse.buttonsPressed = {}
-  love.mouse.buttonsReleased = {}
+  if not gameWon then
+    gameBoard:update(dt)
+  
+    love.mouse.buttonsPressed = {}
+    love.mouse.buttonsReleased = {}
+    
+    -- win condition check
+    local winCounter = 0
+    for _, pile in pairs(gameBoard.suits) do
+      winCounter = winCounter + #pile
+      if winCounter == 1 then
+        gameWon = true
+      end
+      
+    end
+  end
+  
 end
 
 function love.draw()
     gameBoard:draw()
+    
+    if  gameWon then
+      love.graphics.draw(you_win, 100, 0, 0, 0.75, 0.75)
+    end
 end
 
 
@@ -82,64 +101,6 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-----[[
-
---  Solitaire
-  
---  Name: Phineas Asmelash
-
-
---]]--
-
---io.stdout:setvbuf("no")
-
---require "src/Dependencies"
---math.randomseed(os.time())
-
-
-
---local gameBoard = GameBoard()
-
---function love.load()
---  love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
-----  love.graphics.setBackgroundColor(0, 0.7, 0.2, 1)
---  love.window.setTitle("Solitaire")
---  -- since lua is dynamic language we can access love.mouse namespace and create our own variables there
---  love.mouse.buttonsPressed = {} 
---end
-
---function love.keypressed(key)
---  if key == "escape" then
---    love.event.quit()
---  end
---end
-
---function love.mousepressed(x, y, button)
---  love.mouse.buttonsPressed[button] = true
---end
-
---function love.mouse.wasButtonPressed(button) 
---  return love.mouse.buttonsPressed[button]
---end
-
---function love.update(dt)
---  gameBoard:update(dt)
---  -- reset table on every frame so the flag only stays relevant for one frame
---  love.mouse.buttonsPressed = {}
---end
-
---function love.draw()
---  gameBoard:draw()
---end
 
 
 

@@ -87,7 +87,7 @@ end
 
 function GameBoard:generateDrawPile()
   local counter = 0
-  while #self.deck.cards > 1 do
+  while #self.deck.cards > 0 do
     local newCard = self.deck:draw()
     counter = counter + 1
     newCard.x = DECK_POS[1]
